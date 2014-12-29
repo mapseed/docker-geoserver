@@ -22,7 +22,7 @@ ADD resources /tmp/resources
 
 # A little logic to replace the configuration file if it has been
 # included in the repository
-RUN if [-f /tmp/resources/conf/web.xml ]; then \
+RUN if [ -f /tmp/resources/conf/web.xml ]; then \
     cp /tmp/resources/conf/web.xml /usr/local/tomcat/conf/web.xml; \
     fi;
 
