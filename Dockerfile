@@ -20,6 +20,12 @@ RUN apt-get -y install unzip openjdk-7-jre-headless openjdk-7-jre
 
 ADD resources /tmp/resources
 
+# A little logic to replace the configuration file if it has been
+# included in the repository
+RUN if [-f /tmp/resources/conf/web.xml ]; then \
+    cp /tmp/resources/conf/web.xml /usr/local/tomcat/conf/web.xml; \
+    fi;
+
 # A little logic that will fetch the geoserver zip file if it
 # is not available locally in the resources dir and
 RUN if [ ! -f /tmp/resources/geoserver.zip ]; then \
