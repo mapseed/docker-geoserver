@@ -16,7 +16,7 @@ RUN apt-get -y update
 
 #-------------Application Specific Stuff ----------------------------------------------------
 
-RUN apt-get -y install unzip openjdk-7-jre-headless openjdk-7-jre
+RUN apt-get -y install unzip openjdk-7-jre-headless openjdk-7-jre vim
 
 ADD resources /tmp/resources
 
