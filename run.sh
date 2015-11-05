@@ -10,13 +10,17 @@ docker rm geoserver-postgis
 #    mkdir -p $DATA_DIR
 #fi
 
-docker run --name="geoserver-postgis" -t -d kartoza/postgis
+docker run \
+               --name="geoserver-postgis" \
+               --restart=always \
+               -t -d kartoza/postgis
 
 docker run \
   --name=geoserver \
+  --restart=always \
   --link geoserver-postgis:postgis \
-  -v /home/lucas/geoserver_data:/opt/geoserver/data_dir \
-  -v /home/lucas/docker-geoserver/resources/conf/web.xml:/usr/local/tomcat/conf/web.xml \
+  -v /home/geoserver/geoserver_data:/opt/geoserver/data_dir \
+  -v /home/duwamish/docker-geoserver/resources/conf/web.xml:/usr/local/tomcat/conf/web.xml \
   -p 8080:8080 \
   -d \
   -t lukeswart/geoserver
