@@ -1,0 +1,71 @@
+version: '2'
+services:
+  geoserver-postgis:
+    image: kartoza/postgis
+
+  geoserver:
+    image: kartoza/geoserver:2.8.0
+    depends_on:
+      - geoserver-postgis
+    volumes:
+      - ~/geoserver_data:/opt/geoserver/data_dir
+    # ports:
+    #   - "8080:8080"
+
+  letsencrypt:
+    image: certbot/certbot
+    entrypoint: "sh"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/lib/letsencrypt:/var/lib/letsencrypt
+      - ./run-letsencrypt.sh:/run-letsencrypt.sh
+    ports:
+      - "80"
+      - "443"
+    environment:
+      - TERM=xterm
+      - LETSENCRYPT_DOMAINS=${LETSENCRYPT_DOMAINS}
+      - LETSENCRYPT_DEBUG_MODE=${LETSENCRYPT_DEBUG_MODE}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+    command: "/run-letsencrypt.sh"
+
+  # # For local testing only:
+  # nginx:
+  #   image: nginx:stable-alpine
+  #   volumes:
+  #     - ./nginx-envsubst.conf:/etc/nginx/nginx.conf
+  #   links:
+  #     - smartercleanup-api
+  #   volumes_from:
+  #     - smartercleanup-api
+  #   ports:
+  #     - 80:80
+  #   restart: always
+
+  nginx:
+    image: lukeswart/nginx-letsencrypt
+    volumes:
+      - ./nginx-acme-challenge-envsubst.conf:/etc/nginx/nginx.conf
+      - ./nginx-envsubst.conf:/etc/nginx/nginx-secure.conf
+    links:
+      - geoserver
+    volumes_from:
+    #   - geoserver
+      - letsencrypt
+    environment:
+      - MY_DOMAIN_NAME=${MY_DOMAIN_NAME}
+    ports:
+      - 80:80
+      - 443:443
+    restart: always
+
+  # Our cron container that runs our letsencrypt container, and reloads our nginx container
+  letsencrypt-nginx-cron:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./letsencrypt-nginx-cron:/etc/cron.d/letsencrypt-nginx-cron
+    # environment:
+    #   - TZ=${TZ}
+    # TODO: automate timezone script
+    command: sh -c "apk add --update tzdata && cp /usr/share/zoneinfo/US/Pacific /etc/localtime && echo 'America/Los_Angeles' > /etc/timezone && date && apk del tzdata && chmod a+x /etc/cron.d/letsencrypt-nginx-cron && touch /var/log/crond.log && crontab /etc/cron.d/letsencrypt-nginx-cron && crond -l 0 -L /var/log/crond.log && echo 'starting nginx-cron' && tail -f /var/log/crond.log"
