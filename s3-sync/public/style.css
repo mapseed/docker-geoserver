@@ -1,0 +1,29 @@
+button {
+  background-color:#ED518A;
+  height:37px;
+  border: 3px solid #fff;
+  color: #fff;
+  display: inline-block;
+}
+
+.geosync-input {
+  width: 100%;
+  margin: 8px auto;
+  display: flex;
+  justify-content: center;
+}
+
+input {
+  width: 200px;
+  margin: 0 auto;
+}
+
+.form-container {
+    margin: 90px auto;
+    width: 400px;
+    font-family: "Roboto Condensed";
+}
+
+body {
+    background: url(images/lined-paper.png);
+}
