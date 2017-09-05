@@ -19,7 +19,6 @@
   "homepage": "https://github.com/lukeswart/docker-geoserver#readme",
   "dependencies": {
     "aws-cli": "0.0.1",
-    "aws-sdk": "^2.97.0",
     "dotenv": "^4.0.0",
     "express": "^4.15.4"
   },
