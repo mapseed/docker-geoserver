@@ -95,6 +95,15 @@ RUN if [ ! -f /tmp/resources/geoserver.zip ]; then \
     && rm -rf $CATALINA_HOME/webapps/geoserver/data \
     && rm -rf /tmp/geoserver
 
+# Fetch GeoServer plugins
+RUN mkdir -p /tmp/resources/plugins \
+    # Web Processing Service (WPS), for sophisticated styling options
+    && wget https://sourceforge.net/projects/geoserver/files/GeoServer/${GS_VERSION}/extensions/geoserver-${GS_VERSION}-wps-plugin.zip \
+      -O /tmp/resources/plugins/geoserver-${GS_VERSION}-wps-plugin.zip \
+    # CSS styling, for simpler style rules
+    && wget https://sourceforge.net/projects/geoserver/files/GeoServer/${GS_VERSION}/extensions/geoserver-${GS_VERSION}-css-plugin.zip \
+      -O /tmp/resources/plugins/geoserver-${GS_VERSION}-css-plugin.zip
+
 # Install any plugin zip files in resources/plugins
 RUN if ls /tmp/resources/plugins/*.zip > /dev/null 2>&1; then \
       for p in /tmp/resources/plugins/*.zip; do \
