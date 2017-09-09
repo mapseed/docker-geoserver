@@ -16,6 +16,8 @@ function send(event) {
       } else {
         // TODO: render an unauthorized message
         console.error(xhr.statusText);
+        $("#geosync-results .shell").html(xhr.response)
+        $("#geosync-results").css('display', 'block')
       }
     }
   }
