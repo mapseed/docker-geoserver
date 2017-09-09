@@ -11,7 +11,7 @@ function send(event) {
   xhr.onload = function() {
     if (xhr.readyState === 4) {
       if (xhr.status === 200) {
-        $("#geosync-results .shell").html(xhr.response)
+        $(".geosync-results__shell").html(xhr.response)
         $("#geosync-results").css('display', 'block')
       } else {
         // TODO: render an unauthorized message

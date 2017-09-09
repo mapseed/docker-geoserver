@@ -35,8 +35,11 @@ body {
   margin: 0 auto;
   display: none;
 }
-.shell {
+
+.geosync-results__output {
   margin: 16px;
+}
+.geosync-results__shell {
   word-break: break-all;
   white-space:pre-wrap;
   display:inline;
