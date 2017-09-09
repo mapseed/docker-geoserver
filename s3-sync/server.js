@@ -7,8 +7,8 @@ require('dotenv').config()
 
 const app = express();
 // serve our static files:
-app.use('/', express.static(__dirname + '/public'))
+app.use('/', express.static('public'))
 // serve our api requests:
-app.use('/', handleSync)
+app.post('/', handleSync)
 app.listen(3000, function() { console.log('listening') })
 
