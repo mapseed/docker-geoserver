@@ -27,3 +27,18 @@ input {
 body {
     background: url(images/lined-paper.png);
 }
+
+#geosync-results {
+  background: black;
+  font-family: monospace;
+  width: 60em;
+  margin: 0 auto;
+  display: none;
+}
+.shell {
+  margin: 16px;
+  word-break: break-all;
+  white-space:pre-wrap;
+  display:inline;
+  color: white;
+}
