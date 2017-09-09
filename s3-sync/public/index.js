@@ -8,15 +8,17 @@ function send(event) {
   xhr.ontimeout = function () {
     console.error("The request timed out.")
   }
+  xhr.responseType = 'arraybuffer'
   xhr.onload = function() {
     if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        $(".geosync-results__shell").html(xhr.response)
-        $("#geosync-results").css('display', 'block')
-      } else {
-        // TODO: render an unauthorized message
-        console.error(xhr.statusText);
-        $("#geosync-results .shell").html(xhr.response)
+      if (xhr.status === 200 ||
+          xhr.status === 401 ||
+          xhr.status === 500) {
+        var dataView = new DataView(this.response);
+        var decoder = new TextDecoder('utf8');
+        var decodedString = decoder.decode(dataView)
+        $(".geosync-results__shell").html(decodedString)
+
         $("#geosync-results").css('display', 'block')
       }
     }
