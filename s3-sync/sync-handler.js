@@ -13,9 +13,10 @@ const handleSync = async (req, res, next) => {
     password = parts[1]
 
   const geoserverDataDir = process.env.GEOSERVER_DATA_DIR
-  if (!geoserverDataDir) {
+  const s3Bucket = process.env.S3_BUCKET
+  if (!geoserverDataDir || !s3Bucket) {
     res.writeHead(500, { 'Content-Type':'text/plain' })
-    res.end(`GEOSERVER_DATA_DIR is not configured!`)
+    res.end(`GEOSERVER_DATA_DIR or S3_BUCKET are not configured!`)
     return next()
   }
 
@@ -29,7 +30,7 @@ const handleSync = async (req, res, next) => {
   try {
     res.writeHead(200, { 'Content-Type':'text/plain' })
     res.write('stdout:\n')
-    const {stdout, stderr} = await exec(`aws s3 sync ${geoserverDataDir} s3://geoserver-data.mapseed.org/`,
+    const {stdout, stderr} = await exec(`aws s3 sync ${geoserverDataDir} s3://${s3Bucket}/`,
                                         { encoding: 'buffer' })
     res.write(stdout)
     res.write('\nstderr:\n')
