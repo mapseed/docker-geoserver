@@ -12,25 +12,33 @@ const handleSync = async (req, res, next) => {
     username = parts[0],
     password = parts[1]
 
-  if (process.env.USERNAME === username &&
-      process.env.PASSWORD === password) {
-    try {
-      res.writeHead(200, { 'Content-Type':'text/plain' })
-      res.write('stdout:\n')
-      const {stdout, stderr} = await exec('aws s3 ls s3://geoserver-data.mapseed.org/',
-                                          { encoding: 'buffer' })
-      res.write(stdout)
-      res.write('\nstderr:\n')
-      res.end(stderr)
-    } catch (err) {
-      res.writeHead(500, { 'Content-Type':'text/plain' })
-      res.end(`err: ${err}`)
-    }
-  } else {
+  const geoserverDataDir = process.env.GEOSERVER_DATA_DIR
+  if (!geoserverDataDir) {
+    res.writeHead(500, { 'Content-Type':'text/plain' })
+    res.end(`GEOSERVER_DATA_DIR is not configured!`)
+    return next()
+  }
+
+  if (process.env.USERNAME !== username ||
+      process.env.PASSWORD !== password) {
     res.writeHead(401, { 'Content-Type':'text/plain' })
     res.end(`invalid creds!`)
+    return next()
   }
-  next()
+
+  try {
+    res.writeHead(200, { 'Content-Type':'text/plain' })
+    res.write('stdout:\n')
+    const {stdout, stderr} = await exec(`aws s3 sync ${geoserverDataDir} s3://geoserver-data.mapseed.org/`,
+                                        { encoding: 'buffer' })
+    res.write(stdout)
+    res.write('\nstderr:\n')
+    res.end(stderr)
+  } catch (err) {
+    res.writeHead(500, { 'Content-Type':'text/plain' })
+    res.end(`err: ${err}`)
+  }
+  return next()
 }
 
 module.exports = handleSync
