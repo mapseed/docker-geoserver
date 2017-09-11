@@ -12,7 +12,7 @@ MAINTAINER Lucas Stewart <luke@mapseed.org>
 RUN apt-get update -y
 
 # # Install basic applications
-RUN apt-get install -y tar git curl wget dialog net-tools build-essential
+RUN apt-get install -y tar git curl wget dialog net-tools build-essential vim
 
 RUN git clone https://github.com/lukeswart/docker-geoserver.git && cd docker-geoserver && git checkout s3-sync && cd -
 
