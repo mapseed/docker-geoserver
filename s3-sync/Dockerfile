@@ -22,4 +22,4 @@ WORKDIR /docker-geoserver/s3-sync
 # Install our npm dependencies
 RUN NODE_ENV=production npm install
 
-CMD NODE_ENV=production npm start
+CMD ./start.sh
