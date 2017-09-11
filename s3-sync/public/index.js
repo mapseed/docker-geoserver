@@ -23,7 +23,7 @@ function send(event) {
       }
     }
   }
-  xhr.open("POST", '/')
+  xhr.open("POST", './')
   xhr.setRequestHeader("Authorization", "Basic " + btoa(username + ":" + password));
   xhr.send(null)
 }
