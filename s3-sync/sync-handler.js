@@ -1,6 +1,10 @@
 const util = require('util');
 const exec = util.promisify(require('child_process').exec)
 
+process.on('unhandledRejection', function(err, promise) {
+    console.error('Unhandled rejection! (promise: ', promise, ', reason: ', err, ').');
+});
+
 // You can call this with the command:
 // curl --user 'user:pass' http://localhost:3000
 const handleSync = async (req, res, next) => {
@@ -32,10 +36,14 @@ const handleSync = async (req, res, next) => {
     res.write('stdout:\n')
     const {stdout, stderr} = await exec(`aws s3 sync ${geoserverDataDir} s3://${s3Bucket}/`,
                                         { encoding: 'buffer' })
+    console.log("stdout:", stdout)
+    console.log("stderr:", stderr)
     res.write(stdout)
     res.write('\nstderr:\n')
-    res.end(stderr)
+    res.write(stderr)
+    res.end()
   } catch (err) {
+    console.log("err:", err)
     res.writeHead(500, { 'Content-Type':'text/plain' })
     res.end(`err: ${err}`)
   }
