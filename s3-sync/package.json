@@ -1,0 +1,41 @@
+{
+  "name": "geoserver-s3-sync",
+  "version": "0.0.1",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lukeswart/docker-geoserver.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lukeswart/docker-geoserver/issues"
+  },
+  "homepage": "https://github.com/lukeswart/docker-geoserver#readme",
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "express": "^4.15.4"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es6": true,
+      "browser": true
+    },
+    "extends": [
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "sourceType": "module",
+      "ecmaVersion": 2017
+    }
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.0"
+  }
+}
