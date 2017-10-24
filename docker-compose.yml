@@ -1,16 +1,18 @@
 version: '2'
 services:
-  geoserver-postgis:
+  db:
     image: kartoza/postgis:9.6-2.4
+    volumes:
+      - ~/postgres_data/geoserver:/var/lib/postgresql
 
   geoserver:
     image: kartoza/geoserver:2.8.0
-    depends_on:
-      - geoserver-postgis
     volumes:
       - ~/geoserver_data:/opt/geoserver/data_dir
     # ports:
     #   - "8080:8080"
+    links:
+      - db:db
 
   s3-sync:
     image: mapseed/geoserver-data-sync:release-1.0.2
