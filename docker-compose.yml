@@ -56,7 +56,7 @@ services:
   #   restart: always
 
   nginx:
-    image: lukeswart/nginx-letsencrypt:v.19.0
+    image: lukeswart/nginx-letsencrypt
     volumes:
       - ./nginx-acme-challenge-envsubst.conf:/etc/nginx/nginx.conf
       - ./nginx-envsubst.conf:/etc/nginx/nginx-secure.conf
