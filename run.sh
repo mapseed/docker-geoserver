@@ -16,6 +16,7 @@ docker run \
 	--name=geoserver \
 	--link geoserver-postgis:postgis \
         -v $DATA_DIR:/opt/geoserver/data_dir \
+        -v $(pwd)/setenv.sh:/usr/local/tomcat/bin/setenv.sh \
 	-p 8080:8080 \
 	-d \
 	-t kartoza/geoserver
