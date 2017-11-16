@@ -9,7 +9,7 @@ source .env
 if [[ $DEPLOYMENT_TYPE == 'production' ]]; then
     # To avoid substituting nginx-related variables, lets specify only the
     # variables that we will substitute with envsubst:
-    NGINX_VARS='$DOMAINS:$MY_DOMAIN_NAME'
+    NGINX_VARS='$DOMAINS:$MY_DOMAIN_NAME:$WHITELISTED_DOMAINS'
     envsubst "$NGINX_VARS" < nginx.conf > nginx-envsubst.conf
 
     envsubst "$NGINX_VARS" < nginx-acme-challenge.conf > nginx-acme-challenge-envsubst.conf
