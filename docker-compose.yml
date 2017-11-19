@@ -9,6 +9,7 @@ services:
     image: kartoza/geoserver:2.8.0
     volumes:
       - ~/geoserver_data:/opt/geoserver/data_dir
+      - ./setenv.sh:/usr/local/tomcat/bin/setenv.sh
     # ports:
     #   - "8080:8080"
     links:
