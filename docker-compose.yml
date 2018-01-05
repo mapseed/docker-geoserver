@@ -6,7 +6,7 @@ services:
       - ~/postgres_data/geoserver:/var/lib/postgresql
 
   geoserver:
-    image: mapseed/geoserver:1.0.3
+    image: mapseed/geoserver:1.0.4
     volumes:
       - ~/geoserver_data:/opt/geoserver/data_dir
       - ./setenv.sh:/usr/local/tomcat/bin/setenv.sh
