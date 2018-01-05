@@ -17,6 +17,7 @@ RUN apt-get -y update
 #-------------Application Specific Stuff ----------------------------------------------------
 
 ENV GS_VERSION 2.9.1
+ENV GS_VERSION_MAJOR_MINOR 2.9
 ENV GEOSERVER_DATA_DIR /opt/geoserver/data_dir
 
 RUN mkdir -p $GEOSERVER_DATA_DIR
@@ -97,9 +98,12 @@ RUN if [ ! -f /tmp/resources/geoserver.zip ]; then \
 
 # Fetch GeoServer plugins
 RUN mkdir -p /tmp/resources/plugins \
-    # Web Processing Service (WPS), for sophisticated styling options
+    # Web Processing Service (WPS)
     && wget https://sourceforge.net/projects/geoserver/files/GeoServer/${GS_VERSION}/extensions/geoserver-${GS_VERSION}-wps-plugin.zip \
       -O /tmp/resources/plugins/geoserver-${GS_VERSION}-wps-plugin.zip \
+    # MBTiles extension (vector tiles)
+    && wget http://ares.opengeo.org/geoserver/${GS_VERSION_MAJOR_MINOR}.x/community-latest/geoserver-${GS_VERSION_MAJOR_MINOR}-SNAPSHOT-mbtiles-plugin.zip \
+      -O /tmp/resources/plugins/geoserver-${GS_VERSION_MAJOR_MINOR}-SNAPSHOT-mbtiles-plugin.zip \
     # CSS styling, for simpler style rules
     && wget https://sourceforge.net/projects/geoserver/files/GeoServer/${GS_VERSION}/extensions/geoserver-${GS_VERSION}-css-plugin.zip \
       -O /tmp/resources/plugins/geoserver-${GS_VERSION}-css-plugin.zip
