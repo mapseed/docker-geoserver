@@ -1,5 +1,5 @@
 #--------- Generic stuff all our Dockerfiles should start with so we get caching ------------
-FROM tomcat:8.0-jre8
+FROM tomcat:8.0
 MAINTAINER Tim Sutton<tim@linfiniti.com>
 
 RUN  export DEBIAN_FRONTEND=noninteractive
@@ -16,44 +16,42 @@ RUN apt-get -y update
 
 #-------------Application Specific Stuff ----------------------------------------------------
 
-ENV GS_VERSION 2.9.1
+ENV GS_VERSION 2.8.0
+ENV GS_VERSION_MAJOR_MINOR 2.8
 ENV GEOSERVER_DATA_DIR /opt/geoserver/data_dir
-
-RUN mkdir -p $GEOSERVER_DATA_DIR
 
 # Unset Java related ENVs since they may change with Oracle JDK
 ENV JAVA_VERSION=
 ENV JAVA_DEBIAN_VERSION=
 
 # Set JAVA_HOME to /usr/lib/jvm/default-java and link it to OpenJDK installation
-RUN ln -s /usr/lib/jvm/java-8-openjdk-amd64 /usr/lib/jvm/default-java
+RUN ln -s /usr/lib/jvm/java-7-openjdk-amd64 /usr/lib/jvm/default-java
 ENV JAVA_HOME /usr/lib/jvm/default-java
 
 ADD resources /tmp/resources
 
-# If a matching Oracle JDK tar.gz exists in /tmp/resources, move it to /var/cache/oracle-jdk8-installer
-# where oracle-java8-installer will detect it
+# If a matching Oracle JDK tar.gz exists in /tmp/resources, move it to /var/cache/oracle-jdk7-installer
+# where oracle-java7-installer will detect it
 RUN if ls /tmp/resources/*jdk-*-linux-x64.tar.gz > /dev/null 2>&1; then \
-      mkdir /var/cache/oracle-jdk8-installer && \
-      mv /tmp/resources/*jdk-*-linux-x64.tar.gz /var/cache/oracle-jdk8-installer/; \
+      mkdir /var/cache/oracle-jdk7-installer && \
+      mv /tmp/resources/*jdk-*-linux-x64.tar.gz /var/cache/oracle-jdk7-installer/; \
     fi;
 
 # Install Oracle JDK (and uninstall OpenJDK JRE) if the build-arg ORACLE_JDK = true or an Oracle tar.gz
 # was found in /tmp/resources
 ARG ORACLE_JDK=false
-RUN if ls /var/cache/oracle-jdk8-installer/*jdk-*-linux-x64.tar.gz > /dev/null 2>&1 || [ "$ORACLE_JDK" = true ]; then \
-       apt-get autoremove --purge -y openjdk-8-jre-headless && \
-       echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true \
+RUN if ls /var/cache/oracle-jdk7-installer/*jdk-*-linux-x64.tar.gz > /dev/null 2>&1 || [ "$ORACLE_JDK" = true ]; then \
+       apt-get autoremove --purge -y openjdk-7-jre-headless && \
+       echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true \
          | debconf-set-selections && \
-       echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" \
+       echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu precise main" \
          > /etc/apt/sources.list.d/webupd8team-java.list && \
        apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886 && \
-       rm -rf /var/lib/apt/lists/* && \
        apt-get update && \
-       apt-get install -y oracle-java8-installer oracle-java8-set-default && \
-       ln -s --force /usr/lib/jvm/java-8-oracle /usr/lib/jvm/default-java && \
+       apt-get install -y oracle-java7-installer oracle-java7-set-default && \
+       ln -s --force /usr/lib/jvm/java-7-oracle /usr/lib/jvm/default-java && \
        rm -rf /var/lib/apt/lists/* && \
-       rm -rf /var/cache/oracle-jdk8-installer; \
+       rm -rf /var/cache/oracle-jdk7-installer; \
        if [ -f /tmp/resources/jce_policy.zip ]; then \
          unzip -j /tmp/resources/jce_policy.zip -d /tmp/jce_policy && \
          mv /tmp/jce_policy/*.jar $JAVA_HOME/jre/lib/security/; \
@@ -62,16 +60,8 @@ RUN if ls /var/cache/oracle-jdk8-installer/*jdk-*-linux-x64.tar.gz > /dev/null 2
 
 #Add JAI and ImageIO for great speedy speed.
 WORKDIR /tmp
-# A little logic that will fetch the JAI and JAI ImageIO tar file if it
-# is not available locally in the resources dir
-RUN if [ ! -f /tmp/resources/jai-1_1_3-lib-linux-amd64.tar.gz ]; then \
-    wget http://download.java.net/media/jai/builds/release/1_1_3/jai-1_1_3-lib-linux-amd64.tar.gz -P ./resources;\
-    fi; \
-    if [ ! -f /tmp/resources/jai_imageio-1_1-lib-linux-amd64.tar.gz ]; then \
-    wget http://download.java.net/media/jai-imageio/builds/release/1.1/jai_imageio-1_1-lib-linux-amd64.tar.gz -P ./resources;\
-    fi; \
-    mv resources/jai-1_1_3-lib-linux-amd64.tar.gz ./ && \
-    mv resources/jai_imageio-1_1-lib-linux-amd64.tar.gz ./ && \
+RUN wget http://download.java.net/media/jai/builds/release/1_1_3/jai-1_1_3-lib-linux-amd64.tar.gz && \
+    wget http://download.java.net/media/jai-imageio/builds/release/1.1/jai_imageio-1_1-lib-linux-amd64.tar.gz && \
     gunzip -c jai-1_1_3-lib-linux-amd64.tar.gz | tar xf - && \
     gunzip -c jai_imageio-1_1-lib-linux-amd64.tar.gz | tar xf - && \
     mv /tmp/jai-1_1_3/lib/*.jar $JAVA_HOME/jre/lib/ext/ && \
@@ -97,9 +87,12 @@ RUN if [ ! -f /tmp/resources/geoserver.zip ]; then \
 
 # Fetch GeoServer plugins
 RUN mkdir -p /tmp/resources/plugins \
-    # Web Processing Service (WPS), for sophisticated styling options
+    # Web Processing Service (WPS)
     && wget https://sourceforge.net/projects/geoserver/files/GeoServer/${GS_VERSION}/extensions/geoserver-${GS_VERSION}-wps-plugin.zip \
       -O /tmp/resources/plugins/geoserver-${GS_VERSION}-wps-plugin.zip \
+    # MBTiles extension (vector tiles)
+    && wget http://ares.opengeo.org/geoserver/${GS_VERSION_MAJOR_MINOR}.x/community-latest/geoserver-${GS_VERSION_MAJOR_MINOR}-SNAPSHOT-mbtiles-plugin.zip \
+      -O /tmp/resources/plugins/geoserver-${GS_VERSION_MAJOR_MINOR}-SNAPSHOT-mbtiles-plugin.zip \
     # CSS styling, for simpler style rules
     && wget https://sourceforge.net/projects/geoserver/files/GeoServer/${GS_VERSION}/extensions/geoserver-${GS_VERSION}-css-plugin.zip \
       -O /tmp/resources/plugins/geoserver-${GS_VERSION}-css-plugin.zip
@@ -114,7 +107,7 @@ RUN if ls /tmp/resources/plugins/*.zip > /dev/null 2>&1; then \
     fi
 
 # Overlay files and directories in resources/overlays if they exist
-RUN rm -f /tmp/resources/overlays/README.txt && \
+RUN rm /tmp/resources/overlays/README.txt && \
     if ls /tmp/resources/overlays/* > /dev/null 2>&1; then \
       cp -rf /tmp/resources/overlays/* /; \
     fi;
