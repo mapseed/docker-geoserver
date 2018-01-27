@@ -12,6 +12,9 @@ RUN  dpkg-divert --local --rename --add /sbin/initctl
 # Or comment this line out if you do not with to use caching
 ADD 71-apt-cacher-ng /etc/apt/apt.conf.d/71-apt-cacher-ng
 
+# Add custom web.xml configuration file (to support CORS)
+ADD web.xml /usr/local/tomcat/conf/web.xml
+
 RUN apt-get -y update
 
 #-------------Application Specific Stuff ----------------------------------------------------
