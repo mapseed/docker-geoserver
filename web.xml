@@ -498,13 +498,13 @@
 
   <!-- CORS filter -->
   <filter>
-      <filter-name>CorsFilter</filter-name>
-      <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+    <init-param>
+      <param-name>cors.allowed.origins</param-name>
+      <param-value>*</param-value>
+    </init-param>
   </filter>
-  <filter-mapping>
-    <url-pattern>/*</url-pattern>
-      <filter-name>CorsFilter</filter-name>
-  </filter-mapping>
 
   <!-- NOTE: An SSI Servlet is also available as an alternative SSI         -->
   <!-- implementation. Use either the Servlet or the Filter but NOT both.   -->
@@ -599,6 +599,10 @@
     </filter-mapping>
 -->
 
+  <filter-mapping>
+    <url-pattern>/*</url-pattern>
+    <filter-name>CorsFilter</filter-name>
+  </filter-mapping>
 
   <!-- ==================== Default Session Configuration ================= -->
   <!-- You can set the default session timeout (in minutes) for all newly   -->
